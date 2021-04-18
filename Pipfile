@@ -9,6 +9,7 @@ click = "*"
 redis = "*"
 python-decouple = "*"
 pyserial = "*"
+rplidar = "*"
 
 [dev-packages]
 autopep8 = "*"
