@@ -13,5 +13,5 @@ setup(
     author='Tuna Alikasifoglu',
     author_email='tunakasif@gmail.com',
     packages=find_packages(where='detector'),
-    install_requires=["imutils"],
+    install_requires=["imutils", "click", "decouple", "redis"],
 )

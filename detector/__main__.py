@@ -1,4 +1,3 @@
-from datetime import time
 from detector import Detector
 import cv2
 import click
