@@ -5,6 +5,7 @@ import redis
 from typing import Dict, Tuple
 from serial.tools import list_ports
 import numpy as np
+from lidar.filter import Filter, FilterState
 
 
 def get_device_com(comports, vid_pid_tuple: Tuple[int, int]):
@@ -13,17 +14,23 @@ def get_device_com(comports, vid_pid_tuple: Tuple[int, int]):
     return device_com[0] if len(device_com) else None
 
 
-LIDAR_VID_PID = (4292, 60000)
-comports = list(list_ports.comports())
-lidar_dev_com = get_device_com(comports, LIDAR_VID_PID)
-client = redis.Redis()
-
-
 def in_angle(start, stop, angle) -> bool:
     if start < stop:
         return start < angle and angle < stop
     else:
         return start < angle or angle < stop
+
+
+def print_min(dist: float, angle: float):
+    d = f'{dist:0.2f} mm'.rjust(11)
+    a = f'{angle:0.2f} deg'.rjust(10)
+    print(f'Min Dist: {d} {a}', end='\r')
+
+
+LIDAR_VID_PID = (4292, 60000)
+comports = list(list_ports.comports())
+lidar_dev_com = get_device_com(comports, LIDAR_VID_PID)
+client = redis.Redis()
 
 
 @click.command()
@@ -39,28 +46,19 @@ def main(start, stop, port, verbose):
     stop = stop % 360
     COUNT_LIMIT = 10
 
+    myfilter = Filter(COUNT_LIMIT)
     try:
-        measurements = np.zeros(COUNT_LIMIT, dtype=np.float32)
-        measurement_count = 0
-        close_count = 0
         for _, _, angle, distance in lidar.iter_measurments():
             if in_angle(start, stop, angle):
-                if distance:
-                    measurements[measurement_count] = distance
-                    measurement_count += 1
-                    if measurement_count >= COUNT_LIMIT:
-                        min_dist = np.min(measurements)
-                        measurement_count = close_count = 0
-                        client.set('min', float(min_dist))
-                        if verbose:
-                            print(f'Min Dist: {min_dist:0.2f} mm   ', end='\r')
-                else:
-                    close_count += 1
-                    if close_count == COUNT_LIMIT:
-                        measurement_count = close_count = 0
-                        client.delete('min')
-                        if verbose:
-                            print('Min Dist: Too close!   ', end='\r')
+                state, dist, angle = myfilter.enqueue(distance, angle)
+                if state == FilterState.VALID:
+                    client.set('min', float(dist))
+                    if verbose:
+                        print_min(dist, angle)
+                elif state == FilterState.INVALID:
+                    client.delete('min')
+                    if verbose:
+                        print('Min Dist: Invalid distance!           ', end='\r')
     except RPLidarException as e:
         print(e)
     finally:
