@@ -2,10 +2,19 @@
 import numpy as np
 from enum import Enum, auto
 from typing import Optional, Tuple
+from dataclasses import dataclass
+
+
+def in_angle(start: int, stop: int, angle: float) -> bool:
+    if start < stop:
+        return start < angle and angle < stop
+    else:
+        return start < angle or angle < stop
 
 
 class FilterState(Enum):
     INCOMPLETE = auto()
+    OUT_OF_BOUNDS = auto()
     INVALID = auto()
     VALID = auto()
 
@@ -35,3 +44,16 @@ class Filter:
                 return FilterState.INVALID, None, None
 
         return FilterState.INCOMPLETE, None, None
+
+
+class FilterDispatcher:
+    def __init__(self, lidar_ranges, width):
+        self.ranges = lidar_ranges
+        self.filters = {name: Filter(width) for name, *_ in lidar_ranges}
+
+    def dispatch(self, distance: float, angle: float) -> Tuple[FilterState, Optional[float], Optional[float]]:
+        for name, start, stop in self.ranges:
+            if in_angle(start, stop, angle):
+                result = self.filters[name].enqueue(distance, angle)
+                return *result, name
+        return FilterState.OUT_OF_BOUNDS, None, None, None
