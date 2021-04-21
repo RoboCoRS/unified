@@ -10,6 +10,7 @@ redis = "*"
 python-decouple = "*"
 pyserial = "*"
 rplidar = "*"
+numpy = "*"
 
 [dev-packages]
 autopep8 = "*"
