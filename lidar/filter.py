@@ -55,5 +55,5 @@ class FilterDispatcher:
         for name, start, stop in self.ranges:
             if in_angle(start, stop, angle):
                 result = self.filters[name].enqueue(distance, angle)
-                return *result, name
+                return result[0], result[1], result[2], name
         return FilterState.OUT_OF_BOUNDS, None, None, None
