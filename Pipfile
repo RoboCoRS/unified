@@ -9,7 +9,7 @@ click = "*"
 redis = "*"
 python-decouple = "*"
 pyserial = "*"
-rplidar = "*"
+rplidar-roboticia = "*"
 numpy = "*"
 
 [dev-packages]

@@ -58,7 +58,7 @@ def detect(lidar_ranges, port):
 
     dispatcher = FilterDispatcher(lidar_ranges, COUNT_LIMIT)
     try:
-        for _, _, angle, distance in lidar.iter_measurments():
+        for _, _, angle, distance in lidar.iter_measures(scan_type='normal'):
             state, dist, angle, name = dispatcher.dispatch(distance, angle)
             if state == FilterState.VALID:
                 client.set(f'{name}:dist', float(dist))
