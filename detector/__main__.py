@@ -19,7 +19,7 @@ def frame_to_serial(frame, *, ext='.jpg', size=(80, 60)):
     resized = cv2.resize(frame, size)
     _, buf = cv2.imencode(ext, resized)
     to_write = base64.b64encode(buf.tobytes())
-    client.set("serial_image", to_write)
+    client.set('serial_image', to_write)
 
 
 @click.command()
@@ -47,12 +47,15 @@ def main(device, frame_size, display, serial):
             fps_text = f'FPS: {fps.fps():0.0f}'
             if center_x and center_y:
                 center_text = f'Center: ({center_x:0.3f}, {center_y:0.3f})'
-                client.set("center:x", center_x)
-                client.set("center:y", center_y)
+                client.set('center:x', center_x)
+                client.set('center:y', center_y)
             else:
-                center_text = "Center: None"
-                client.delete("center:x")
-                client.delete("center:y")
+                center_text = 'Center: None'
+                client.delete('center:x')
+                client.delete('center:y')
+
+            if serial:
+                frame_to_serial(frame)
 
             if display:
                 cv2.putText(frame, center_text, (20, 80),
@@ -71,4 +74,3 @@ try:
     main()
 except KeyboardInterrupt or SystemExit:
     cv2.destroyAllWindows()
-    pass
