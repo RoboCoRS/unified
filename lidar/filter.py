@@ -39,7 +39,7 @@ class Filter:
                 return FilterState.VALID, self.distances[idx], self.angles[idx]
         else:
             self.invalid += 1
-            if self.invalid >= self.width:
+            if self.invalid >= self.width * 10:
                 self.valid = self.invalid = 0
                 return FilterState.INVALID, None, None
 
