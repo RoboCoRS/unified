@@ -8,11 +8,11 @@ def read(relative: str) -> str:
 
 
 setup(
-    name='detector',
+    name='lidar',
     version='0.2',
     author='Atahan Yorgancı',
     author_email='atahanyorganci@hotmail.com',
-    packages=find_packages(where='detector'),
+    packages=find_packages(where='lidar'),
     install_requires=["redis", "pyserial",
                       "rplidar", "click", "numpy"],
 )
