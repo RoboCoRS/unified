@@ -1,14 +1,14 @@
 from serial import Serial
 import redis
 from serial.tools import list_ports
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
-ESP32_VID_PID = (6790, 29987)
+ESP32_VID_PID = [(6790, 29987)]
 
 
-def get_device_com(comports, vid_pid_tuple: Tuple[int, int]):
+def get_device_com(comports, vid_pid_tuple: List[Tuple[int, int]]):
     device_com = [com.device for com in comports
-                  if (com.vid, com.pid) == vid_pid_tuple]
+                  if (com.vid, com.pid) in vid_pid_tuple]
     return device_com[0] if len(device_com) else None
 
 

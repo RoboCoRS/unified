@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 from serial.tools import list_ports
 from pathlib import Path
 import click
@@ -7,9 +7,9 @@ import json
 import os
 
 
-def get_device_com(comports, vid_pid_tuple: Tuple[int, int]):
+def get_device_com(comports, vid_pid_tuple: List[Tuple[int, int]]):
     device_com = [com.device for com in comports
-                  if (com.vid, com.pid) == vid_pid_tuple]
+                  if (com.vid, com.pid) in vid_pid_tuple]
     return device_com[0] if len(device_com) else None
 
 
@@ -28,9 +28,9 @@ def write_device_com_json(file_path: Path,
 @click.option('-v', '--verbose', count=True)
 def main(output_json, verbose):
     VID_PID = {
-        'ardun': (1027, 24577),
-        'lidar': (4292, 60000),
-        'esp32': (6790, 29987),
+        'ardun': [(1027, 24577), (9025, 66)],
+        'lidar': [(4292, 60000)],
+        'esp32': [(6790, 29987)],
     }
     comports = list(list_ports.comports())
     device_coms = {k: get_device_com(comports, v)
