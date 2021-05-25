@@ -9,8 +9,8 @@ click = "*"
 redis = "*"
 python-decouple = "*"
 pyserial = "*"
-rplidar-roboticia = "*"
 numpy = "*"
+rplidar = "*"
 
 [dev-packages]
 autopep8 = "*"
