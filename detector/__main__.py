@@ -27,24 +27,29 @@ def frame_to_serial(frame, *, ext='.jpg', size=(80, 60)):
 @click.option('--frame-size', type=click.STRING, default=None)
 @click.option('-d', '--display', is_flag=True)
 @click.option('-s', '--serial', is_flag=True)
-def main(device, frame_size, display, serial):
+@click.option('-q', '--quiet', is_flag=True)
+def main(device, frame_size, display, serial, quiet):
     global client
 
     frame_size = tuple(
         [int(part) for part in frame_size.split('x')]) if frame_size else None
-    size = os.get_terminal_size()
+    if not quiet:
+        size = os.get_terminal_size()
     with Detector(device, frame_size) as detector:
         target, target_type = None, None
         while True:
-            fps = FPS().start()
-            fps.update()
+            if not quiet:
+                fps = FPS().start()
+                fps.update()
             frame, target, target_type, center_x, center_y = detector.detect(
                 target, target_type)
-            fps.stop()
+            if not quiet:
+                fps.stop()
+                fps_text = f'FPS: {fps.fps():0.0f}'
+
             if display and cv2.waitKey(1) == 27:
                 break
 
-            fps_text = f'FPS: {fps.fps():0.0f}'
             if center_x and center_y:
                 center_text = f'Center: ({center_x:0.3f}, {center_y:0.3f})'
                 client.set('center:x', center_x)
@@ -64,8 +69,9 @@ def main(device, frame_size, display, serial):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 0, 255), 2)
                 cv2.imshow('Detected', frame)
             else:
-                print(f'{center_text} {fps_text}'.ljust(
-                    size.columns, ' '), end='\r')
+                if not quiet:
+                    print(f'{center_text} {fps_text}'.ljust(
+                        size.columns, ' '), end='\r')
 
         cv2.destroyAllWindows()
 
