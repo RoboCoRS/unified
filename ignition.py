@@ -10,7 +10,7 @@ k_DEBUG = True
 
 
 def ignite_redis() -> psutil.Process:
-    proc = Popen(['wsl', 'redis-server'],
+    proc = Popen(['redis-server'],
                  stdout=DEVNULL,
                  stderr=DEVNULL)
     p = psutil.Process(proc.pid)
@@ -80,7 +80,7 @@ def main(client: redis.Redis,
         if control_p and control_p.is_running():
             control_p.terminate()
         if redis_p and redis_p.is_running():
-            run(['wsl', 'redis-cli', 'shutdown'],
+            run(['redis-cli', 'shutdown'],
                 stdout=DEVNULL,
                 stderr=DEVNULL)
             if redis_p and redis_p.is_running():
