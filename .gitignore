@@ -1,3 +1,6 @@
+# Redis
+dump.rdb
+
 # VS Code
 .vscode/*
 
