@@ -11,6 +11,8 @@ python-decouple = "*"
 pyserial = "*"
 numpy = "*"
 rplidar = "*"
+psutil = "*"
+keyboard = "*"
 
 [dev-packages]
 autopep8 = "*"
