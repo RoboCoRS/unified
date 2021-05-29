@@ -1,7 +1,8 @@
-from subprocess import Popen, DEVNULL
+from subprocess import Popen, run, DEVNULL
 from time import sleep
 from pathlib import Path
 from typing import List
+import os
 import psutil
 import redis
 
@@ -9,18 +10,17 @@ k_DEBUG = True
 
 
 def ignite_redis() -> psutil.Process:
-    proc = Popen(['redis-server'],
+    proc = Popen(['wsl', 'redis-server'],
                  stdout=DEVNULL,
                  stderr=DEVNULL)
     p = psutil.Process(proc.pid)
     return p
 
 
-def ignite_helpers(helper_progs: List[Path]) -> List[psutil.Process]:
-    procs = [Popen(['/usr/bin/python3', f'{prog}'],
-                   stdout=DEVNULL,
-                   stderr=DEVNULL)
-             for prog in helper_progs]
+def ignite_helpers(helper_progs: List[List[str]]) -> List[psutil.Process]:
+    procs = [Popen(prog) for prog in helper_progs]
+    # procs = [Popen(prog, stdout=DEVNULL, stderr=DEVNULL)
+    #          for prog in helper_progs]
     ps = [psutil.Process(proc.pid) for proc in procs]
     return ps
 
@@ -29,7 +29,7 @@ def ignite_controller(scenario_number: int,
                       controller_progs: List[Path]) -> psutil.Process:
     scenario_number = max(1, min(scenario_number, len(controller_progs)))
     prog = controller_progs[scenario_number - 1]
-    proc = Popen(['/usr/bin/python3', f'{prog}',
+    proc = Popen(['python', f'{prog}',
                   f'-s {scenario_number}'])
     p = psutil.Process(proc.pid)
     return p
@@ -56,33 +56,35 @@ def main(client: redis.Redis,
             if new_scenario is None:
                 if control_p and control_p.is_running():
                     control_p.terminate()
-                    control_p.kill()
                     sleep(0.01)
                     control_p = None
-                print(f'Scenario {None}:                ', end='\r')
+
             elif new_scenario != old_scenario:
                 if control_p and control_p.is_running():
                     control_p.terminate()
-                    control_p.kill()
                     sleep(0.01)
                 control_p = ignite_controller(new_scenario, controller_progs)
                 if debug:
                     all_ps.append(control_p)
 
             old_scenario = new_scenario
+            print(f'Scenario {old_scenario}:                ', end='\r')
             sleep(0.01)
 
-    except KeyboardInterrupt:
+    except:
+        pass
+    finally:
         for p in helper_ps:
             if p and p.is_running():
                 p.terminate()
-                p.kill()
         if control_p and control_p.is_running():
             control_p.terminate()
-            control_p.kill()
         if redis_p and redis_p.is_running():
-            redis_p.terminate()
-            redis_p.kill()
+            run(['wsl', 'redis-cli', 'shutdown'],
+                stdout=DEVNULL,
+                stderr=DEVNULL)
+            if redis_p and redis_p.is_running():
+                redis_p.terminate()
         sleep(0.01)
 
         if debug:
@@ -94,16 +96,16 @@ if __name__ == '__main__':
     client = redis.Redis()
 
     cwd = Path.cwd()
-    detector_path = Path.joinpath(cwd, 'program1.py')
-    lidar_path = Path.joinpath(cwd, 'program1.py')
-    serial_path = Path.joinpath(cwd, 'program1.py')
-    helper_programs = [detector_path, lidar_path, serial_path]
+    detector_prog = ['python', '-m', 'detector', '0', '-s', '-q']
+    lidar_prog = ['python', '-m', 'lidar', 'detect', 'front:340-20']
+    serial_prog = ['python', os.path.join('scripts', 'serial_esp.py')]
+    helper_programs = [detector_prog, lidar_prog, serial_prog]
 
-    scenario1_path = Path.joinpath(cwd, 'controller.py')
-    scenario2_path = Path.joinpath(cwd, 'controller.py')
-    scenario3_path = Path.joinpath(cwd, 'controller.py')
-    scenario4_path = Path.joinpath(cwd, 'controller.py')
-    scenario5_path = Path.joinpath(cwd, 'controller.py')
+    scenario1_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
+    scenario2_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
+    scenario3_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
+    scenario4_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
+    scenario5_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
 
     controller_programs = [scenario1_path, scenario2_path,
                            scenario3_path, scenario4_path,
