@@ -11,6 +11,7 @@ python-decouple = "*"
 pyserial = "*"
 numpy = "*"
 rplidar = "*"
+flask = "*"
 
 [dev-packages]
 autopep8 = "*"

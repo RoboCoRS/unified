@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <style>
+            .container {
+                margin: auto;
+                width: 60%;
+                position: relative;
+                font-family: "Courier New", Courier, monospace;
+            }
+            .container > h1 {
+                text-align: center;
+            }
+            .img {
+                margin: auto;
+                display: block;
+                min-width: 75%;
+            }
+            .btn_wrapper {
+                text-align: center;
+            }
+            .btn {
+                display: inline-block;
+                background: #000;
+                border-radius: 4px;
+                font-family: "Courier New", Courier, monospace;
+                font-size: 14px;
+                color: #fff;
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+        </style>
+        <div class="container">
+            <h1>RoboCoRS - {{ name }}</h1>
+            <img class="img" src="data:image/gif;base64," />
+            <form action="/scenario">
+                <h2>Select Scenario</h2>
+                {% for scenario in scenarios %}
+                <input
+                    type="radio"
+                    id="{{ scenario['name'] }}"
+                    name="index"
+                    value="{{ scenario['index'] }}"
+                />
+                <label for="{{ scenario['name'] }}">
+                    {{ scenario["name"] }}
+                </label>
+                <br />
+                {% endfor %}
+                <div class="btn_wrapper">
+                    <input type="submit" value="Submit" class="btn" />
+                </div>
+            </form>
+        </div>
+        <script>
+            async function update() {
+                const response = await fetch("/pic");
+                const text = await response.text();
+                const img = document.querySelector(".img");
+                img.src = `data:image/gif;base64,${text}`;
+            }
+            function start() {
+                const interval = setInterval(update, {{ interval }});
+                return () => clearInterval(interval);
+            }
+            const stop = start();
+        </script>
+    </body>
+</html>
