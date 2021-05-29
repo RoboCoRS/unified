@@ -20,6 +20,17 @@ void setup() {
     server.on("/pic", HTTP_GET, [&](AsyncWebServerRequest *request) {
         request->send(200, "text/html", image_old);
     });
+    server.on("/scenario", HTTP_GET, [&](AsyncWebServerRequest *request) {
+        auto count = request->params();
+        for (size_t i = 0; i < count; i++) {
+            auto param = request->getParam(i);
+            if (param->name() == "index") {
+                auto value = param->value().toInt();
+                Serial.write(value);
+            }
+        }
+        request->redirect("/");
+    });
 
     server.begin();
 }
