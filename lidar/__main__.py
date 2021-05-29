@@ -1,4 +1,5 @@
-from time import sleep
+from time import sleep, time
+import os
 from rplidar import RPLidar, RPLidarException
 import click
 import redis
@@ -36,6 +37,7 @@ def get_device_com(comports, vid_pid_tuple: List[Tuple[int, int]]):
     return device_com[0] if len(device_com) else None
 
 
+DEBUG = False
 LIDAR_VID_PID = [(4292, 60000)]
 comports = list(list_ports.comports())
 lidar_dev_com = get_device_com(comports, LIDAR_VID_PID)
@@ -45,6 +47,33 @@ client = redis.Redis()
 @click.group()
 def cli():
     pass
+
+
+def time_it(func):
+    if not DEBUG:
+        return func
+
+    size = os.get_terminal_size()
+    col_count = size.columns
+
+    def timed(*args, **kwargs):
+        start = time() * 1e9
+        result = func(*args, **kwargs)
+        delta = time() * 1e9 - start
+        out = f'{func.__name__} took {delta:0.2f} ns to execute'
+        print(out.ljust(col_count), end='\r')
+        return result
+    return timed
+
+
+@time_it
+def process_data(dispatcher, distance, angle):
+    state, dist, angle, name = dispatcher.dispatch(distance, angle)
+    if state == FilterState.VALID:
+        client.set(f'{name}:dist', float(dist))
+        client.set(f'{name}:angle', float(angle))
+    elif state == FilterState.INVALID:
+        client.delete(f'{name}:dist', f'{name}:angle')
 
 
 @cli.command()
@@ -58,13 +87,8 @@ def detect(lidar_ranges, port):
 
     dispatcher = FilterDispatcher(lidar_ranges, COUNT_LIMIT)
     try:
-        for _, _, angle, distance in lidar.iter_measures(scan_type='normal'):
-            state, dist, angle, name = dispatcher.dispatch(distance, angle)
-            if state == FilterState.VALID:
-                client.set(f'{name}:dist', float(dist))
-                client.set(f'{name}:angle', float(angle))
-            elif state == FilterState.INVALID:
-                client.delete(f'{name}:dist', f'{name}:angle')
+        for _, _, angle, distance in lidar.iter_measurments():
+            process_data(dispatcher, distance, angle)
     except RPLidarException as e:
         print(e)
     finally:
