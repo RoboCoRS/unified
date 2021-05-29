@@ -5,8 +5,14 @@ from typing import List
 import os
 import psutil
 import redis
+import platform
 
 k_DEBUG = True
+
+if platform.system() == 'Windows':
+    py_cmd = 'python'
+else:
+    py_cmd = 'python3'
 
 
 def ignite_redis() -> psutil.Process:
@@ -19,17 +25,16 @@ def ignite_redis() -> psutil.Process:
 
 def ignite_helpers(helper_progs: List[List[str]]) -> List[psutil.Process]:
     procs = [Popen(prog) for prog in helper_progs]
-    # procs = [Popen(prog, stdout=DEVNULL, stderr=DEVNULL)
-    #          for prog in helper_progs]
     ps = [psutil.Process(proc.pid) for proc in procs]
     return ps
 
 
 def ignite_controller(scenario_number: int,
                       controller_progs: List[Path]) -> psutil.Process:
+    global py_cmd
     scenario_number = max(1, min(scenario_number, len(controller_progs)))
     prog = controller_progs[scenario_number - 1]
-    proc = Popen(['python', f'{prog}',
+    proc = Popen([py_cmd, f'{prog}',
                   f'-s {scenario_number}'])
     p = psutil.Process(proc.pid)
     return p
@@ -96,9 +101,9 @@ if __name__ == '__main__':
     client = redis.Redis()
 
     cwd = Path.cwd()
-    detector_prog = ['python', '-m', 'detector', '0', '-s', '-q']
-    lidar_prog = ['python', '-m', 'lidar', 'detect', 'front:340-20']
-    serial_prog = ['python', os.path.join('scripts', 'serial_esp.py')]
+    detector_prog = [py_cmd, '-m', 'detector', '0', '-s', '-q']
+    lidar_prog = [py_cmd, '-m', 'lidar', 'detect', 'front:340-20']
+    serial_prog = [py_cmd, os.path.join('scripts', 'serial_esp.py')]
     helper_programs = [detector_prog, lidar_prog, serial_prog]
 
     scenario1_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
