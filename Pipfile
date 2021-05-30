@@ -10,7 +10,7 @@ redis = "*"
 python-decouple = "*"
 pyserial = "*"
 numpy = "*"
-rplidar = "*"
+rplidar-roboticia = "*"
 psutil = "*"
 keyboard = "*"
 
