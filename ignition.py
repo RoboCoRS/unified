@@ -107,8 +107,14 @@ if __name__ == '__main__':
                   'f:340-20',
                   'fl:320-340',
                   'fr:20-40',
+                  'l:260-280',
                   'r:80-100']
-    serial_prog = [py_cmd, os.path.join('scripts', 'serial_esp.py')]
+    serial_prog = [py_cmd, os.path.join('scripts', 'serial_esp.py'),
+                   'f:Front',
+                   'fl:FrontLeft',
+                   'fr:FrontRight',
+                   'l:Left',
+                   'r:Right']
     helper_programs = [detector_prog, lidar_prog, serial_prog]
 
     scenario1_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
