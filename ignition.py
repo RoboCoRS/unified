@@ -16,7 +16,7 @@ else:
 
 
 def ignite_redis() -> psutil.Process:
-    proc = Popen(['redis-server'],
+    proc = Popen(['wsl', 'redis-server'],
                  stdout=DEVNULL,
                  stderr=DEVNULL)
     p = psutil.Process(proc.pid)
@@ -85,11 +85,12 @@ def main(client: redis.Redis,
         if control_p and control_p.is_running():
             control_p.terminate()
         if redis_p and redis_p.is_running():
-            run(['redis-cli', 'shutdown'],
+            run(['wsl', 'redis-cli', 'shutdown'],
                 stdout=DEVNULL,
                 stderr=DEVNULL)
             if redis_p and redis_p.is_running():
                 redis_p.terminate()
+        run([py_cmd, '-m', 'lidar', 'stop'])
         sleep(0.01)
 
         if debug:
@@ -107,7 +108,8 @@ if __name__ == '__main__':
                   'left:250-290',
                   'right:70-110']
     serial_prog = [py_cmd, os.path.join('scripts', 'serial_esp.py')]
-    helper_programs = [detector_prog, lidar_prog, serial_prog]
+    # helper_programs = [detector_prog, lidar_prog, serial_prog]
+    helper_programs = [detector_prog, lidar_prog]
 
     scenario1_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
     scenario2_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')

@@ -77,6 +77,17 @@ def process_data(dispatcher, distance, angle):
 
 
 @cli.command()
+@click.option('--port', type=str, default=lidar_dev_com)
+def stop(port):
+    lidar = RPLidar(port)
+    lidar.start_motor()
+    sleep(0.01)
+    lidar.stop()
+    lidar.stop_motor()
+    lidar.disconnect()
+
+
+@cli.command()
 @click.argument('lidar_ranges', type=LidarRangeType(), nargs=-1)
 @click.option('--port', type=str, default=lidar_dev_com)
 def detect(lidar_ranges, port):
