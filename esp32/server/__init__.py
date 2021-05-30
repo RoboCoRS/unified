@@ -8,9 +8,10 @@ import socket
 import base64
 import cv2
 import re
+import random
 
 app = Flask(__name__)
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap = cv2.VideoCapture(0)
 
 
 def get_context(*, name=None, interval=None):
@@ -36,13 +37,22 @@ def get_context(*, name=None, interval=None):
 def get_image(*, size: Optional[Tuple[int, int]] = None) -> str:
     _, frame = cap.read()
     frame = cv2.flip(frame, 1)
-    if size:
+    if size is not None:
         frame = cv2.resize(frame, size)
     content = cv2.imencode('.jpg', frame)[1]
     return base64.b64encode(content)
 
 
-CONTEXT = get_context()
+def get_data():
+    data = [('Center', 10, 24.5), ('Left', 40, 40.5), ('Right', 35, 324.5)]
+    out = []
+    for name, dist, angle in data:
+        out.append((name, dist + 10 * random.random(),
+                   angle + 5 * random.random()))
+    return out
+
+
+CONTEXT = get_context(name='GroupB4')
 
 
 @app.cli.command('dump', help='Dump HTML template as C++ header file to stdout')
@@ -60,7 +70,8 @@ def dump(name, interval):
     print()
     print('#include <Arduino.h>')
     print()
-    print(f'const String base_html = "{content}";')
+    print(f'const String DEVICE_NAME = "{name}";')
+    print(f'const String BASE_HTML = "{content}";')
 
 
 @app.cli.command('serial', help='Print default video capture to serial port')
@@ -89,6 +100,15 @@ def pic():
 
 @app.route('/scenario')
 def scenario():
-    if "index" in request.args:
-        app.logger.info(f'Selecting Scenario {request.args["index"]}')
-    return redirect('/')
+    if "index" not in request.args:
+        return redirect('/')
+
+    index = request.args["index"]
+    app.logger.info(f'Selecting Scenario {index}')
+    return redirect(f'/?index={index}')
+
+
+@app.route('/lidar')
+def lidar():
+    data = get_data()
+    return ';'.join(f'{name}-{dist:0.2f}-{angle:0.2f}' for name,  dist, angle in data)
