@@ -102,7 +102,10 @@ if __name__ == '__main__':
 
     cwd = Path.cwd()
     detector_prog = [py_cmd, '-m', 'detector', '0', '-s', '-q']
-    lidar_prog = [py_cmd, '-m', 'lidar', 'detect', 'front:340-20']
+    lidar_prog = [py_cmd, '-m', 'lidar', 'detect',
+                  'front:340-20',
+                  'left:250-290',
+                  'right:70-110']
     serial_prog = [py_cmd, os.path.join('scripts', 'serial_esp.py')]
     helper_programs = [detector_prog, lidar_prog, serial_prog]
 
