@@ -25,6 +25,14 @@ def main():
             if serial_image:
                 serial.write(serial_image)
                 serial.write('*'.encode('ascii'))
+            if serial.in_waiting:
+                num = int.from_bytes(serial.read(), 'big')
+                if num > 0:
+                    print(f'Switching to scenario {num}')
+                    client.set('scenario', num)
+                else:
+                    print('Stopping...')
+                    client.delete('scenario')
 
 
 if __name__ == "__main__":
