@@ -18,7 +18,7 @@
             }
             .img {
                 display: block;
-                min-width: 50%;
+                width: 90vh;
                 grid-column-start: 0;
                 grid-column-end: 4;
             }
@@ -115,10 +115,9 @@
                     ctx.moveTo(CENTER_X, CENTER_Y);
                     const distance = parseInt(data[i][1]);
                     const angle = (90 - parseInt(data[i][2])) * Math.PI / 180;
-                    const x = CENTER_X + 2.5 * distance * Math.cos(angle);
-                    const y = CENTER_Y - 2.5 * distance * Math.sin(angle);
+                    const x = CENTER_X + distance * Math.cos(angle);
+                    const y = CENTER_Y - distance * Math.sin(angle);
                     ctx.lineTo(x, y);
-                    console.log(x, y)
                 }
                 ctx.strokeStyle = '#ff0000';
                 ctx.lineWidth = 2;
@@ -129,7 +128,7 @@
                 data.forEach(d => {
                     const name = d[0];
                     const distance = d[1];
-                    const angle = d[1];
+                    const angle = d[2];
                     html += `<p><strong>${name}:</strong> ${distance} mm at ${angle} degree angle</p>`
                 });
                 const lidar = document.querySelector(".lidar_data");

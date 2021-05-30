@@ -95,7 +95,7 @@ def index():
 
 @app.route('/pic')
 def pic():
-    return get_image()
+    return get_image(size=(120, 80))
 
 
 @app.route('/scenario')
