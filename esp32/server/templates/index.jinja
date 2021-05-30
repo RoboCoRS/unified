@@ -116,8 +116,9 @@
                     ctx.moveTo(CENTER_X, CENTER_Y);
                     const distance = parseInt(data[i][1]);
                     const angle = (90 - parseInt(data[i][2])) * Math.PI / 180;
-                    const x = CENTER_X + distance / 1400 * Math.cos(angle);
-                    const y = CENTER_Y - distance / 1400 * Math.sin(angle);
+                    const x = CENTER_X + distance / 1400 * SIZE * Math.cos(angle);
+                    const y = CENTER_Y - distance / 1400 * SIZE * Math.sin(angle);
+                    console.log(x, y)
                     ctx.lineTo(x, y);
                 }
                 ctx.strokeStyle = '#ff0000';
@@ -175,7 +176,6 @@
                 }
             }
             updateScenario();
-            repaint([["a", 40, 0], ["b", 30, 40], ["c", 20, 320]]);
             const stop = start();
         </script>
     </body>
