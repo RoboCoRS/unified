@@ -30,8 +30,10 @@ void setup() {
         for (size_t i = 0; i < count; i++) {
             auto param = request->getParam(i);
             if (param->name() == "index") {
-                auto value = param->value().toInt();
-                Serial.write(value);
+                auto value = param->value();
+                Serial.write(value.toInt());
+                request->redirect("/?index=" + value);
+                return;
             }
         }
         request->redirect("/");
