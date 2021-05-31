@@ -1,8 +1,6 @@
-
 import numpy as np
 from enum import Enum, auto
 from typing import Optional, Tuple
-from dataclasses import dataclass
 
 
 def in_angle(start: int, stop: int, angle: float) -> bool:
