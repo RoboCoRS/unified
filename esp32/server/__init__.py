@@ -44,15 +44,22 @@ def get_image(*, size: Optional[Tuple[int, int]] = None) -> str:
 
 
 def get_data():
-    data = [('Center', 10, 24.5), ('Left', 40, 40.5), ('Right', 35, 324.5)]
+    data = [('Front', 6000, 3),
+            ('Front Left', 3900, 325),
+            ('Front Right', 4000, 36),
+            ('Left', 4200, 275),
+            ('Right', 4100, 80)]
     out = []
     for name, dist, angle in data:
-        out.append((name, dist + 10 * random.random(),
+        out.append((name, dist + 20 * random.random(),
                    angle + 5 * random.random()))
     return out
 
 
-CONTEXT = get_context(name='GroupB4')
+if app.config['DEBUG']:
+    CONTEXT = get_context(interval=100)
+else:
+    CONTEXT = get_context(interval=16, name='GroupB4')
 
 
 @app.cli.command('dump', help='Dump HTML template as C++ header file to stdout')
@@ -95,7 +102,10 @@ def index():
 
 @app.route('/pic')
 def pic():
-    return get_image(size=(120, 80))
+    if app.config['DEBUG']:
+        return get_image(size=(120, 80))
+    else:
+        return get_image()
 
 
 @app.route('/scenario')
