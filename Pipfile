@@ -10,8 +10,8 @@ redis = "*"
 python-decouple = "*"
 pyserial = "*"
 numpy = "*"
-rplidar = "*"
 flask = "*"
+rplidar-roboticia = "*"
 
 [dev-packages]
 autopep8 = "*"
