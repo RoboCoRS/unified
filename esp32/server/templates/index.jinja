@@ -33,6 +33,7 @@
             }
             .btn_wrapper {
                 text-align: center;
+                margin-top: 1rem;
             }
             .scenario {
                 text-align: center;
@@ -51,7 +52,17 @@
         <div class="container">
             <h1 class="header">RoboCoRS - {{ name }}</h1>
             <div class="content_container">
-                <img class="img" src="data:image/gif;base64," />
+                <div>
+                    <img class="img" src="data:image/gif;base64," />
+                    <div class="btn_wrapper">
+                        <input
+                            id="start"
+                            class="btn"
+                            type="button"
+                            value="Stop Stream"
+                        />
+                    </div>
+                </div>
                 <div class="lidar">
                     <h3>Lidar Data</h3>
                     <div class="lidar_data"></div>
@@ -174,8 +185,20 @@
                     h2.innerHTML = `Current Scenario - ${scenarioName}`;
                 }
             }
+            const start_btn = document.getElementById("start");
+            let stop = start();
+            function handleStart() {
+                const state = start_btn.value;
+                if (state === "Start Stream") {
+                    start_btn.value = "Stop Stream";
+                    stop = start();
+                } else {
+                    start_btn.value = "Start Stream";
+                    stop();
+                }
+            }
+            start_btn.addEventListener("click", handleStart)
             updateScenario();
-            const stop = start();
         </script>
     </body>
 </html>
