@@ -39,7 +39,7 @@ def main(lidar_ranges):
     dists_str = [f'{name}:dist' for name in names]
     angles_str = [f'{name}:angle' for name in names]
 
-    with Serial(esp32_dev_com, baudrate=350000) as serial:
+    with Serial(esp32_dev_com, baudrate=256000) as serial:
         while True:
             serial_image = client.get('serial_image')
             if serial_image:
