@@ -9,3 +9,7 @@ The `OpenCV` library is a requirement of the project. On ARM based systems, comp
 `pip install opencv-contrib-python`
 
 In addition, [Redis](https://redis.io/) must be installed for the system, in order to handle inter-process communication.
+
+## Project Structure
+
+- `esp32` contains mock webserver, and source files for ESP32 programming, [link](./esp32/README.md)
