@@ -98,7 +98,8 @@ def detect(lidar_ranges, port):
 
     dispatcher = FilterDispatcher(lidar_ranges, COUNT_LIMIT)
     try:
-        for _, _, angle, distance in lidar.iter_measures(scan_type='normal'):
+        for _, _, angle, distance in lidar.iter_measures(scan_type='normal',
+                                                         max_buf_meas=4500):
             process_data(dispatcher, distance, angle)
     except RPLidarException as e:
         print(e)
