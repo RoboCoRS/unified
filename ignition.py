@@ -53,6 +53,7 @@ def main(client: redis.Redis,
         for p in helper_ps:
             all_ps.append(p)
 
+    sleep(1)
     try:
         while True:
             new_scenario = client.get('scenario')
