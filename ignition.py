@@ -117,11 +117,11 @@ if __name__ == '__main__':
                    'r:Right']
     helper_programs = [detector_prog, lidar_prog, serial_prog]
 
-    scenario1_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
-    scenario2_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
-    scenario3_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
-    scenario4_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
-    scenario5_path = Path.joinpath(cwd, 'ignition_test', 'keyboard_test.py')
+    scenario1_path = Path.joinpath(cwd, '..', 'motorpwm', 'follower.py')
+    scenario2_path = Path.joinpath(cwd, '..', 'motorpwm', 'keyboard_drive.py')
+    scenario3_path = Path.joinpath(cwd, '..', 'motorpwm', 'controller.py')
+    scenario4_path = Path.joinpath(cwd, '..', 'motorpwm', 'controller.py')
+    scenario5_path = Path.joinpath(cwd, '..', 'motorpwm', 'hostile.py')
 
     controller_programs = [scenario1_path, scenario2_path,
                            scenario3_path, scenario4_path,
