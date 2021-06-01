@@ -1,5 +1,5 @@
 # Redis
-dump.rdb
+*.rdb
 
 # VS Code
 .vscode/*
