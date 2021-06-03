@@ -77,6 +77,17 @@ def process_data(dispatcher, distance, angle):
 
 
 @cli.command()
+@click.option('--port', type=str, default=lidar_dev_com)
+def stop(port):
+    lidar = RPLidar(port)
+    lidar.start_motor()
+    sleep(0.01)
+    lidar.stop()
+    lidar.stop_motor()
+    lidar.disconnect()
+
+
+@cli.command()
 @click.argument('lidar_ranges', type=LidarRangeType(), nargs=-1)
 @click.option('--port', type=str, default=lidar_dev_com)
 def detect(lidar_ranges, port):
@@ -87,7 +98,8 @@ def detect(lidar_ranges, port):
 
     dispatcher = FilterDispatcher(lidar_ranges, COUNT_LIMIT)
     try:
-        for _, _, angle, distance in lidar.iter_measurments():
+        for _, _, angle, distance in lidar.iter_measures(scan_type='normal',
+                                                         max_buf_meas=4500):
             process_data(dispatcher, distance, angle)
     except RPLidarException as e:
         print(e)
@@ -109,6 +121,7 @@ def display(name):
             else:
                 formatted = f'Distance({name}, INVALID_DISTANCE)'
             print(formatted.ljust(40, ' '), end='\r')
+            sleep(0.01)
     except KeyboardInterrupt:
         pass
 

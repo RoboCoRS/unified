@@ -12,6 +12,8 @@ pyserial = "*"
 numpy = "*"
 flask = "*"
 rplidar-roboticia = "*"
+psutil = "*"
+keyboard = "*"
 
 [dev-packages]
 autopep8 = "*"
