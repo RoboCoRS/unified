@@ -2,6 +2,21 @@
 
 Unified codebase for the senior project course, EEE 493/4: Industrial Design Project, at Bilkent University.
 
+## Table of Contents
+
+  - [Acknowledgement](#acknowledgement)
+  - [Aim](#aim)
+  - [Project Structure](#project-structure)
+  - [Software Requirements for Main Microcontroller](#software-requirements-for-main-microcontroller)
+    - [x86](#x86)
+    - [ARM](#arm)
+  - [Software Requirements for Peripheral Devices](#software-requirements-for-peripheral-devices)
+  - [Hardware Requirements](#hardware-requirements)
+  - [Usage of Modules](#usage-of-modules)
+    - [detector](#detector)
+    - [lidar](#lidar)
+  - [Simple Usage](#simple-usage)
+
 ## Acknowledgement
 
 - This project was realized in cooperation with ROKETSAN.
@@ -20,6 +35,10 @@ In this project autonomous mobile robots with heterogeneous hardware configurati
    
 These scenarios test robots’ ability to identify a predefined target, and converge on the said target using  local mapping of the environment. More challenging problems such as path finding in an environment with obstacles, are solved using custom grid-based obstacle avoidance algorithm. Developed systems such as object identification, and path finding are required  to run in parallel.  For process orchestration, and lightweight message passing Redis will be used, for low memory footprint, and low communication overhead. More detailed information like equipment list, searching algorithms, target and peer detection preferences, etc. provided in [docs/report.pdf](./docs/report.pdf)  
 
+## Project Structure
+
+The project consists of pre-defined five scenarios. The actions that we take in the light of same information varies between these scenarios, but we need to obtain camera and LiDAR feed and stream them for each scenario. In this context, we are running `detector` and `lidar` modules along with the [ESP32 serial communication script](./scripts/serial_esp.py) in the background. These modules are continuously fulfilling their tasks and writing necessary information to the running `redis-server` on the device. Then, the running motor controller script, for the selected scenario, takes action according to the information on the `redis-server`.
+
 ## Software Requirements for Main Microcontroller
 
 A lightweight database system [Redis](https://redis.io/) must be installed, in order to handle inter-process communication. The `OpenCV` library is a requirement of the project. On ARM based systems, compilation from the [source](https://github.com/opencv/opencv) is required. Hence, this dependency is not included in the `Pipfile` or `requirements.txt` for the sake of generality. Therefore, we recommend the following steps for `x86` and `ARM` architectures respectively for installing necessary requirements.
@@ -30,20 +49,28 @@ A lightweight database system [Redis](https://redis.io/) must be installed, in o
 2. Obtain appropriate version of `Python`.
 3. We recommend using a virtual environment with the help of `pipenv`. Install `pipenv` using 
    
-   `pip install --user pipenv`
+   ```shell
+   $ pip install --user pipenv
+   ```
 
 4. Clone this project and `cd` into it.
 5. Create a virtual environment with the command 
-
-    `pipenv shell`
+   
+   ```shell
+   $ pipenv shell
+   ```
     
 6. Install necessary packages with the command
-
-    `pipenv install`
+   
+   ```shell
+   $ pipenv install
+   ```
     
 7. Install `OpenCV` additionally with the command
-
-    `pipenv install opencv-contrib-python`
+   
+   ```shell
+   $ pipenv install opencv-contrib-python
+   ```
 
 ### ARM
 
@@ -52,8 +79,10 @@ A lightweight database system [Redis](https://redis.io/) must be installed, in o
 3. Obtain appropriate version of `Python`.
 4. Clone this project and `cd` into it.   
 5. Install necessary packages with the command
-
-    `pip install -r requirements.txt`
+   
+   ```shell
+   $ pip install -r requirements.txt
+   ```
 
 ## Software Requirements for Peripheral Devices
 
@@ -65,15 +94,19 @@ For the entirety of the program a camera must be connected to the main controlle
 
 - Note that the provided code recognizes these devices by identifying them from their `(VID, PID)` pairs. For this project the utilized components have unique pairs, so it did not create a problem. For some `Arduino` clones these pairs can have the same values with `ESP32`, which can cause problems with device identification.
 
-## Project Structure
-
-The project consists of pre-defined five scenarios. The actions that we take in the light of same information varies between these scenarios, but we need to obtain camera and LiDAR feed and stream them for each scenario. In this context, we are running `detector` and `lidar` modules along with the [ESP32 serial communication script](./scripts/serial_esp.py) in the background. These modules are continuously fulfilling their tasks and writing necessary information to the running `redis-server` on the device. Then, the running motor controller script, for the selected scenario, takes action according to the information on the `redis-server`.
-
 ## Usage of Modules
 
-In order to use the modules, the `redis-server` must be running in the background. If [Redis](https://redis.io/) is successfully installed on your system, running the command `redis-server` in your terminal starts the on device server.
+In order to use the modules, the `redis-server` must be running in the background. If [Redis](https://redis.io/) is successfully installed on your system, running the following command in your terminal starts the on device server.
+
+```shell
+$ redis-server
+``` 
+
+There are two main modules in the project that can be run `detector` and `lidar`. These modules can be run separately, although the `redis-server` must be running in the background. The specifications of these modules are described below.
 
 ### detector
+
+The detector module takes the device number as an argument. If there are multiple cameras are present in the system you can extend the program by running the detector module several times with different device IDs. The first and default device ID is `0`. The `frame-size` optional argument takes a dimensions separated by an `x` in the form of `WIDTHxHEIGHT`, e.g., `640x480`, which adjusts the proportions of the camera feed. It uses cameras default dimensions if nothing is passed for this option. The `serial` option enables the `detector` module to write the current frame to `redis-server`, so that the [ESP32 serial communication script](./scripts/serial_esp.py) can forward it to `ESP32`. Then we have the `display` and `quiet` options. By default the module displays the center point of the target and the current FPS value in the terminal, since during the scenarios there is no need to waste resources to display the camera feed on device, where we should only interact with the robots from the `ESP32`. For debug purposes the module provides `display` option to display real-time camera feed on device. Finally the `quite` option eliminates the default output provided in the terminal. 
 
 ```
 Usage: python -m detector [OPTIONS] DEVICE
@@ -87,6 +120,8 @@ Options:
 ```
 
 ### lidar
+
+`NAME:START-STOP`
 
 ```
 Usage: python -m lidar [OPTIONS] COMMAND [ARGS]...
@@ -116,3 +151,9 @@ Options:
 ```
 
 ## Simple Usage
+
+We provided a script, `ignition.py`, to initiate every helper program, then the user can set the desired scenario with the [scenario changer script](./scripts/scenario_changer.py) if device access present, or from the client service that can be accessed by connecting to the host on `ESP32`. The `ignition.py` starts the `detector` and `lidar` modules as separate processes along with the [ESP32 serial communication script](./scripts/serial_esp.py) in the background. If a scenario selection is detected, `ignition.py` kills the on-going scenario script's process, if there is an on-going scenario, and creates a new process with the selected scenario's script. When all the requirements are satisfied, and all the hardware connections are correct, the user can simply start the whole project with the following command.
+```
+python ignition.py
+```
+This script starts the program with the default values of the modules and starts streaming on the `ESP32`.
