@@ -121,7 +121,7 @@ Options:
 
 ### lidar
 
-`NAME:START-STOP`
+There are three commands for the `lidar` module: `detect`, `display` and `stop`.  
 
 ```
 Usage: python -m lidar [OPTIONS] COMMAND [ARGS]...
@@ -135,6 +135,8 @@ Commands:
   stop
 ```
 
+First of them is the `detect` command. This command takes multiple arguments in form of `LIDAR_RANGES`, i.e., `NAME:START-STOP`, e.g., `front:340-20`. For the LiDAR that can scan 360 degrees, it takes a key pair which consists of a key name and the angle interval in modulo 360 corresponds to the key name. For the given key, the LiDAR filter that we implemented provides the minimum distance that it can detect an obstacle.
+
 ```
 Usage: python -m lidar detect [OPTIONS] [LIDAR_RANGES]...
 
@@ -143,12 +145,16 @@ Options:
   --help       Show this message and exit.
 ```
 
+With the `display` command, you can display the live feed of a key provided in the running version of `detect` command. Since the `detect` command constantly updates the distances that correspond to provided keys, with `display` command you can observe the any of the keys with the command below.  
+
 ```
 Usage: python -m lidar display [OPTIONS] NAME
 
 Options:
   --help  Show this message and exit.
 ```
+
+Finally the `stop` command is an external fail safe, that is added for `ignition.py`, to stop the motor of the RPLIDAR and gracefully shutdown the LiDAR.
 
 ## Simple Usage
 
