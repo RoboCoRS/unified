@@ -1,6 +1,8 @@
 # RoboCoRS Unified Codebase
 
-Unified codebase for the senior project course, EEE 493/4: Industrial Design Project, at Bilkent University.
+Unified codebase for Bilkent University 2020-2021 EEE 493/4 Industrial Design Project Group B4
+
+- [Video Demonstration](https://youtu.be/zBDo_ttYPt8)
 
 ## Table of Contents
 
@@ -36,6 +38,8 @@ In this project autonomous mobile robots with heterogeneous hardware configurati
 These scenarios test robots’ ability to identify a predefined target, and converge on the said target using  local mapping of the environment. More challenging problems such as path finding in an environment with obstacles, are solved using custom grid-based obstacle avoidance algorithm. Developed systems such as object identification, and path finding are required  to run in parallel.  For process orchestration, and lightweight message passing Redis will be used, for low memory footprint, and low communication overhead. More detailed information like equipment list, searching algorithms, target and peer detection preferences, etc. provided in [docs/report.pdf](./docs/report.pdf)  
 
 ## Project Structure
+
+![Big Picture](https://github.com/RoboCoRS/unified/blob/main/docs/big_picture.png)
 
 The project consists of pre-defined five scenarios. The actions that we take in the light of same information varies between these scenarios, but we need to obtain camera and LiDAR feed and stream them for each scenario. In this context, we are running `detector` and `lidar` modules along with the [ESP32 serial communication script](./scripts/serial_esp.py) in the background. These modules are continuously fulfilling their tasks and writing necessary information to the running `redis-server` on the device. Then, the running motor controller script, for the selected scenario, takes action according to the information on the `redis-server`.
 
