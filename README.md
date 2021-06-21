@@ -160,7 +160,7 @@ Options:
 
 Finally the `stop` command is an external fail safe, that is added for `ignition.py`, to stop the motor of the RPLIDAR and gracefully shutdown the LiDAR.
 
-## Simple Usage
+## Simple Usage 
 
 We provided a script, `ignition.py`, to initiate every helper program, then the user can set the desired scenario with the [scenario changer script](./scripts/scenario_changer.py) if device access present, or from the client service that can be accessed by connecting to the host on `ESP32`. The `ignition.py` starts the `detector` and `lidar` modules as separate processes along with the [ESP32 serial communication script](./scripts/serial_esp.py) in the background. If a scenario selection is detected, `ignition.py` kills the on-going scenario script's process, if there is an on-going scenario, and creates a new process with the selected scenario's script. When all the requirements are satisfied, and all the hardware connections are correct, the user can simply start the whole project with the following command.
 
